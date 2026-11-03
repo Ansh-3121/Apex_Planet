@@ -1,0 +1,19 @@
+-- 1 Sales by Gende( Male VS Female )
+select gender ,Round(sum(Total_sales),0) as Total_sales from  apex_planet group by gender;
+
+-- 2. Top-Selling Category by City
+with T as (select city ,category,total_sales,dense_rank() over (partition by city order by total_sales desc) as rnk from apex_planet)
+select city,category,total_sales from T where rnk=1 ;
+
+-- 3. Top 3 Products by Total Sales
+select product,count(*) as Total_customers ,round(sum(Total_sales)) as Total_sales 
+from apex_planet group by product order by round(sum(Total_sales)) desc limit 3;
+
+-- 4. Top 10 Customers by Total Purchases
+select customer_name,round(sum(Total_sales)) from apex_planet group by customer_name order by  Round(sum(Total_sales),0) desc limit 10;
+
+-- 5. Top 3 Categories by Gender
+with a as (select gender,category,round(sum(total_sales),0) as total_sales from apex_planet group by gender,category),
+b as (select gender,category,Total_sales,dense_rank() over (partition by gender order by total_sales desc ) as Rnk
+ from a order by gender,Rnk) 
+ select * from b where rnk<=3;
